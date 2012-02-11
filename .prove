@@ -1,18 +1,28 @@
 ---
-generation: 3
-last_run_time: 1328956588.34804
+generation: 142
+last_run_time: 1329003976.56264
 tests:
   "./t/heroku.t":
-    elapsed: 0.0259411334991455
-    gen: 3
-    last_fail_time: 1328956583.19844
-    last_pass_time: 1328956588.34667
+    elapsed: 24.8426029682159
+    gen: 142
+    last_fail_time: 1329003878.23566
+    last_pass_time: 1329003976.56201
     last_result: 0
-    last_run_time: 1328956588.34667
+    last_run_time: 1329003976.56201
     last_todo: 0
-    mtime: 1328956587
-    seq: 3
-    total_failures: 2
-    total_passes: 1
+    mtime: 1329003946
+    seq: 142
+    total_failures: 134
+    total_passes: 7
+  t/heroku.t:
+    elapsed: 0.0218508243560791
+    gen: 6
+    last_fail_time: 1328991518.46624
+    last_result: 1
+    last_run_time: 1328991518.46624
+    last_todo: 0
+    mtime: 1329003946
+    seq: 6
+    total_failures: 1
 version: 1
 ...

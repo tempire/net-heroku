@@ -4,6 +4,7 @@ use Mojo::Base -base;
 use Net::Heroku::UserAgent;
 use Data::Dumper;
 use Mojo::JSON;
+use Mojo::Util 'url_escape';
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
@@ -58,7 +59,21 @@ sub config {
 sub add_key {
   my ($self, %params) = (shift, @_);
 
-  return $self->ua->put('/user/keys' => $params{key});
+  return 1 if $self->ua->post('/user/keys' => $params{key})->res->{code} == 200;
+}
+
+sub keys {
+  my ($self, %params) = (shift, @_);
+
+  return @{$self->ua->get('/user/keys')->res->json};
+}
+
+sub remove_key {
+  my ($self, %params) = (shift, @_);
+
+  my $res = $self->ua->delete('/user/keys/'.url_escape($params{key_name}))->res;
+  return 1 if $res->{code} == 200;
+}
 
 1;
 

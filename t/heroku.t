@@ -39,13 +39,15 @@ subtest config => sub {
 };
 
 subtest keys => sub {
-  ok my $res = Dwarn $h->create;
+  #ok my $res = Dwarn $h->create;
 
-  $h->add_key(key => '123412341234');
-  ok grep $_->{key} == '123412341234' => $h->keys;
+  my $key = 'ssh-dss AAAAB3NzaC1kc3MAAACBAONzl+UOQhOFZBw6vIuoDKTOzUeGPJVK+yYlVTco0HbF/YwpIQ4TewrAQoTcZ9Q3bdIMN1ZBBpc4tAYDsAUiuDdhciyZ4E8O30fjAWDRzf7hhv/T9Lmtt8ttzI0vpuPslqdfHLgUTY+FKEQfgF4I/PsWb1P2HQOOhQnid/HoKWcXAAAAFQClEvS8P/iqVabeB/NL4TzUsvyPswAAAIBnc1aLB/zqkmhQpWFbUqh6v9xSnkqcTazA/E1Bhjzppq96SuZ4mNvuN3ZGsVj8Bfz/ZvWPUonBFqU8/lAJXjvIc8tN3EvbGQkks03s/Iav4OWN6hovfOLwqEK7yfeo73bTEkZ0BjqGlGuCeQrIJle4Fz4MHPCaNtsWQ3BBeCIJ/AAAAIEAtBm6wHK9EJnmNFec1eqGW3E/1/WDZ76xgBO07PKodponbn+o50LB6obOyMpJ92pvbZLOoVooSXZnRln6VqbUtE4yJoBk2gb4HVhF40MCYg7ed2sFoH2ofoFfpYXl++TeUv2KuKeWhUzVj9rnKbcn5lvNTlpoFfPoarwlrdJsp4s= glen@Glen-Hinkles-MacBook-Pro.local';
 
-  $h->remove_key(key => '123412341234');
-  ok !grep $_->{key} == '123412341234' => $h->keys;
+  #ok $h->add_key(key => $key);
+  #ok grep $_->{contents} eq $key => $h->keys;
+
+  $h->remove_key(key_name => 'glen@Glen-Hinkles-MacBook-Pro.local');
+  ok !grep $_->{contents} eq $key => $h->keys;
 };
 
 #subtests processes => sub {

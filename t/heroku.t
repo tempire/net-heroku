@@ -5,80 +5,47 @@ use Devel::Dwarn;
 use Data::Dumper;
 
 my $username = 'cpantests@empireenterprises.com';
-my $api_key = 'f3d3e05d403651c24d1dc36532fe6b3884baf76a';
+my $api_key  = 'f3d3e05d403651c24d1dc36532fe6b3884baf76a';
 
 ok my $h = Net::Heroku->new(api_key => $api_key);
 
 subtest apps => sub {
+  plan skip_all => 'because';
+
   #ok my $res = $h->create(name => 'net-heroku-perl');
   #is $res->{name} => 'net-heroku-perl';
 
-  ok my $res = $h->create;
-  ok $res->{name};
+  ok my $res = Dwarn $h->create(stack => 'bamboo');
+  like $res->{stack} => qr/^bamboo/;
 
   ok grep $_->{name} eq $res->{name} => $h->apps;
+  warn Dumper $h->apps;
 
   ok $h->destroy(name => $res->{name});
 
-  $h->destroy(name => $_->{name}) for $h->apps;
-
   #
   #  ok !grep $_->{name} eq $res->{name} => $h->apps;
+};
 
-  #is_deeply { $h->create($name, stack => 'cedar') } => {
-  #  "id"                  => 000000,
-  #  "name"                => "example",
-  #  "create_status"       => "complete",
-  #  "created_at"          => "2011/01/01 00:00:00 -0700",
-  #  "stack"               => "cedar",
-  #  "requested_stack"     => undef,
-  #  "repo_migrate_status" => "complete",
-  #  "slug_size"           => 1000000,
-  #  "repo_size"           => 1000000,
-  #  "dynos"               => 1,
-  #  "workers"             => 0
-  #};
-  #is_deeply [$h->apps] => [
-  #  { "id"                  => 000000,
-  #    "name"                => "example",
-  #    "create_status"       => "complete",
-  #    "created_at"          => "2011/01/01 00:00:00 -0700",
-  #    "stack"               => "cedar",
-  #    "requested_stack"     => undef,
-  #    "repo_migrate_status" => "complete",
-  #    "slug_size"           => 1000000,
-  #    "repo_size"           => 1000000,
-  #    "dynos"               => 1,
-  #    "workers"             => 0
-  #  }
-  #];
+subtest config => sub {
+  plan skip_all => 'because';
+  ok my $res = Dwarn $h->create;
+  my $buildpack_url = 'http://github.com/judofyr/perloku.git';
 
-  #is_deeply [$h->apps($name)] => [
-  #  { "id"                  => 000000,
-  #    "name"                => "example",
-  #    "create_status"       => "complete",
-  #    "created_at"          => "2011/01/01 00:00:00 -0700",
-  #    "stack"               => "cedar",
-  #    "requested_stack"     => undef,
-  #    "repo_migrate_status" => "complete",
-  #    "slug_size"           => 1000000,
-  #    "repo_size"           => 1000000,
-  #    "dynos"               => 1,
-  #    "workers"             => 0
-  #  }
-  #];
+  $h->add_config(name => $res->{name}, BUILDPACK_URL => $buildpack_url);
+  is $h->config(name => $res->{name})->{BUILDPACK_URL} => $buildpack_url;
 
-  #ok $h->rename($name => $newname);
+  ok $h->destroy(name => $res->{name});
+};
 
-# #New owner
-  #ok $h->transfer($name => $new_owner);
+subtest keys => sub {
+  ok my $res = Dwarn $h->create;
 
-  #ok $h->maintenance_mode($name => 0);
-  #ok !$h->maintenance_mode($name);
-  #ok $h->maintenance_mode($name => 1);
-  #ok $h->maintenance_mode($name);
+  $h->add_key(key => '123412341234');
+  ok grep $_->{key} == '123412341234' => $h->keys;
 
-  #ok $h->destroy($name);
+  $h->remove_key(key => '123412341234');
+  ok !grep $_->{key} == '123412341234' => $h->keys;
 };
 
 #subtests processes => sub {

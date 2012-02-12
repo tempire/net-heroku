@@ -1,8 +1,9 @@
 package Net::Heroku;
-use Modern::Perl +2012;
+use Modern::Perl + 2012;
 use Mojo::Base -base;
 use Net::Heroku::UserAgent;
 use Data::Dumper;
+use Mojo::JSON;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
@@ -33,11 +34,31 @@ sub create {
   my @ar = map +("app[$_]" => $params{$_}) => keys %params;
   %params = (
     'app[stack]' => 'cedar',
+    'app[collaborators]' => 'cpantests@empireenterprises.com',
     @ar,
   );
 
   return $self->ua->post_form('/apps', {%params})->res->json;
 }
+
+sub add_config {
+  my ($self, %params) = (shift, @_);
+
+  return $self->ua->put('/apps/'
+      . delete($params{name})
+      . '/config_vars' => Mojo::JSON->new->encode(\%params))->res->json;
+}
+
+sub config {
+  my ($self, %params) = (shift, @_);
+
+  return $self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json;
+}
+
+sub add_key {
+  my ($self, %params) = (shift, @_);
+
+  return $self->ua->put('/user/keys' => $params{key});
 
 1;
 

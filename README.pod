@@ -9,6 +9,14 @@ Heroku API
 
 =head1 USAGE
 
+    my $h = Net::Heroku->new(api_key => ...);
+    my $res = $h->create;
+
+    $h->add_config(name => $res->{name}, BUILDPACK_URL => ...);
+    $h->restart(name => $res->{name});
+
+    $h->destroy(name => $res->{name});
+
 =head1 METHODS
 
 =head2 new (api_key => $api_key)

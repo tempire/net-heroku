@@ -11,7 +11,7 @@ my $api_key  = 'f3d3e05d403651c24d1dc36532fe6b3884baf76a';
 ok my $h = Net::Heroku->new(api_key => $api_key);
 
 subtest apps => sub {
-  #plan skip_all => 'because' unless TEST;
+  plan skip_all => 'because' unless TEST;
 
   ok my %res = $h->create(stack => 'bamboo');
   like $res{stack} => qr/^bamboo/;

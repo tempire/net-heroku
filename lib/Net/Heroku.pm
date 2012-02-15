@@ -1,7 +1,6 @@
 package Net::Heroku;
 use Mojo::Base -base;
 use Net::Heroku::UserAgent;
-use Devel::Dwarn;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 

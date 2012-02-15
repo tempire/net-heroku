@@ -1,6 +1,5 @@
 package Net::Heroku::UserAgent;
 use Mojo::Base 'Mojo::UserAgent';
-use Data::Dwarn;
 
 has 'host';
 has 'tx';

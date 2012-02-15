@@ -33,7 +33,7 @@ Requires app name.  Destroys app.  Returns true if successful.
 
 =head2 create
 
-Creates a Heroku app.  Accepts optional hash list as values.
+Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
 
 =head2 add_config (name => $name, %()) -> {}
 
@@ -63,11 +63,11 @@ Requires app name.  Returns list of processes.
 
 Requires app name and command.  Runs command once.
 
-=head2 restart (name => $name, <ps => $ps>, <type => $type)
+=head2 restart (name => $name, <ps => $ps>, <type => $type>)
 
 Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
 
-=head2 stop (name => $name, <ps => $ps>, <type => $type)
+=head2 stop (name => $name, <ps => $ps>, <type => $type>)
 
 Requires app name.  Stop app process.
 

@@ -45,7 +45,7 @@ sub create {
     @ar,
   );
 
-  return $self->ua->post_form('/apps', {%params})->res->json;
+  return %{$self->ua->post_form('/apps', {%params})->res->json};
 }
 
 sub add_config {
@@ -149,7 +149,7 @@ Requires app name.  Destroys app.  Returns true if successful.
 
 =head2 create
 
-Creates a Heroku app.  Accepts optional hash list as values.
+Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
 
 =head2 add_config (name => $name, %()) -> {}
 

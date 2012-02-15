@@ -1,0 +1,72 @@
+
+=head1 NAME
+
+Net::Heroku - Heroku API
+
+=head1 DESCRIPTION
+
+Heroku API
+
+=head1 USAGE
+
+=head1 METHODS
+
+=head2 new (api_key => $api_key)
+
+Requires api key. Returns Net::Heroku object.
+
+=head2 apps
+
+Returns list of hash references with app information
+
+=head2 destroy (name => $name)
+
+Requires app name.  Destroys app.  Returns true if successful.
+
+=head2 create
+
+Creates a Heroku app.  Accepts optional hash list as values.
+
+=head2 add_config (name => $name, %()) -> {}
+
+Requires app name.  Adds config variables passed in hash list.
+
+=head2 config (name => $name)
+
+Requires app name.  Returns hash reference of config variables.
+
+=head2 add_key (key => $key)
+
+Requires key.  Adds ssh public key.
+
+=head2 keys
+
+Returns list of keys.
+
+=head2 remove_key (key_name => $key_name)
+
+Requires name associated with key.  Removes key.
+
+=head2 ps (name => $name)
+
+Requires app name.  Returns list of processes.
+
+=head2 run (name => $name, command => $command)
+
+Requires app name and command.  Runs command once.
+
+=head2 restart (name => $name, <ps => $ps>, <type => $type)
+
+Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
+
+=head2 stop (name => $name, <ps => $ps>, <type => $type)
+
+Requires app name.  Stop app process.
+
+=head1 VERSION
+
+0.01
+
+=head AUTHOR
+
+Glen Hinkle C<tempire@cpan.org>

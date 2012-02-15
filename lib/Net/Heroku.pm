@@ -1,8 +1,7 @@
 package Net::Heroku;
-use Modern::Perl + 2012;
 use Mojo::Base -base;
 use Net::Heroku::UserAgent;
-use Data::Dumper;
+use Devel::Dwarn;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
@@ -22,6 +21,13 @@ sub apps {
   return @{$self->ua->get('/apps')->res->json};
 }
 
+sub app_created {
+  my ($self, %params) = (shift, @_);
+
+  return 1
+    if $self->ua->put('/apps/' . $params{name} . '/status')->res->code == 201;
+}
+
 sub destroy {
   my ($self, %params) = @_;
 
@@ -35,7 +41,6 @@ sub create {
   my @ar = map +("app[$_]" => $params{$_}) => keys %params;
   %params = (
     'app[stack]' => 'cedar',
-    'app[collaborators]' => 'cpantests@empireenterprises.com',
     @ar,
   );
 
@@ -59,7 +64,8 @@ sub config {
 sub add_key {
   my ($self, %params) = (shift, @_);
 
-  return 1 if $self->ua->post('/user/keys' => $params{key})->res->{code} == 200;
+  return 1
+    if $self->ua->post('/user/keys' => $params{key})->res->{code} == 200;
 }
 
 sub keys {
@@ -71,9 +77,40 @@ sub keys {
 sub remove_key {
   my ($self, %params) = (shift, @_);
 
-  my $res = $self->ua->delete('/user/keys/'.url_escape($params{key_name}))->res;
+  my $res =
+    $self->ua->delete('/user/keys/' . url_escape($params{key_name}))->res;
   return 1 if $res->{code} == 200;
 }
+
+sub ps {
+  my ($self, %params) = (shift, @_);
+
+  return @{$self->ua->get('/apps/' . $params{name} . '/ps')->res->json};
+}
+
+sub run {
+  my ($self, %params) = (shift, @_);
+
+  return $self->ua->post_form('/apps/' . $params{name} . '/ps' => \%params)
+    ->res->json;
+}
+
+sub restart {
+  my ($self, %params) = (shift, @_);
+
+  return 1
+    if $self->ua->post_form(
+    '/apps/' . $params{name} . '/ps/restart' => \%params)->res->code == 200;
+}
+
+sub stop {
+  my ($self, %params) = (shift, @_);
+
+  return 1
+    if $self->ua->post_form('/apps/' . $params{name} . '/ps/stop' => \%params)
+    ->res->code == 200;
+}
+
 
 1;
 
@@ -88,6 +125,58 @@ Heroku API
 =head1 USAGE
 
 =head1 METHODS
+
+=head2 new (api_key => $api_key)
+
+Requires api key. Returns Net::Heroku object.
+
+=head2 apps
+
+Returns list of hash references with app information
+
+=head2 destroy (name => $name)
+
+Requires app name.  Destroys app.  Returns true if successful.
+
+=head2 create
+
+Creates a Heroku app.  Accepts optional hash list as values.
+
+=head2 add_config (name => $name, %()) -> {}
+
+Requires app name.  Adds config variables passed in hash list.
+
+=head2 config (name => $name)
+
+Requires app name.  Returns hash reference of config variables.
+
+=head2 add_key (key => $key)
+
+Requires key.  Adds ssh public key.
+
+=head2 keys
+
+Returns list of keys.
+
+=head2 remove_key (key_name => $key_name)
+
+Requires name associated with key.  Removes key.
+
+=head2 ps (name => $name)
+
+Requires app name.  Returns list of processes.
+
+=head2 run (name => $name, command => $command)
+
+Requires app name and command.  Runs command once.
+
+=head2 restart (name => $name, <ps => $ps>, <type => $type)
+
+Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
+
+=head2 stop (name => $name, <ps => $ps>, <type => $type)
+
+Requires app name.  Stop app process.
 
 =head1 VERSION
 

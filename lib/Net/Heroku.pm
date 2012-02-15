@@ -191,6 +191,6 @@ Requires app name.  Stop app process.
 
 0.01
 
-=head AUTHOR
+=head1 AUTHOR
 
 Glen Hinkle C<tempire@cpan.org>

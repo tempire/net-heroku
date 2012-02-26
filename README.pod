@@ -6,24 +6,27 @@ Net::Heroku - Heroku API
 
 Heroku API
 
+Requires Heroku account - free @ L<http://heroku.com>
+
 =head1 USAGE
 
     my $h = Net::Heroku->new(api_key => ...);
-    my $res = $h->create;
+    my %res = $h->create;
 
-    $h->add_config(name => $res->{name}, BUILDPACK_URL => ...);
-    $h->restart(name => $res->{name});
+    $h->add_config(name => $res{name}, BUILDPACK_URL => ...);
+    $h->restart(name => $res{name});
 
-    say $_{name} for $h->apps;
+    say $_->{name} for $h->apps;
+
+    $h->destroy(name => $res{name});
 
 
-    $h->destroy(name => $res->{name});
+    warn 'Error:' . $h->error                     # Error: App not found.
+      if not $h->destroy(name => $res{name});
 
-    warn $h->error if $h->destroy(name => $res->{name}); # App not found.
-
-    if ($h->destroy(name => $res->{name})) {
+    if (!$h->destroy(name => $res{name})) {
       my %err = $h->error;
-      warn $err{code}, $err{message}; # 404, App not found.
+      warn "$err{code}, $err{message}";           # 404, App not found.
     }
 
 =head1 METHODS
@@ -99,7 +102,11 @@ If the last request was successful, returns empty list.
 
 =head1 SEE ALSO
 
-L<Mojo::UserAgent>, L<https://api-docs.heroku.com/>, L<http://mojolicio.us/perldoc/Mojo/UserAgent#DEBUGGING|MOJO_USERAGENT_DEBUG>
+L<Mojo::UserAgent>, L<http://mojolicio.us/perldoc/Mojo/UserAgent#DEBUGGING>, L<https://api-docs.heroku.com/>
+
+=head1 SOURCE
+
+L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 

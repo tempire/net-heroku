@@ -4,7 +4,7 @@ use Net::Heroku::UserAgent;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
@@ -191,68 +191,103 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head1 METHODS
 
-=head2 new (api_key => $api_key)
+=head2 new
+
+    my $h = Net::Heroku->new(api_key => $api_key);
 
 Requires api key. Returns Net::Heroku object.
 
 =head2 apps
 
+    my @apps = $h->apps;
+
 Returns list of hash references with app information
 
-=head2 destroy (name => $name)
+=head2 destroy
+
+    my $bool = $h->destroy(name => $name);
 
 Requires app name.  Destroys app.  Returns true if successful.
 
 =head2 create
 
+    my $app = $h->create;
+
 Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
 
-=head2 add_config (name => $name, %()) -> %()
+=head2 add_config
 
-Requires app name.  Adds config variables passed in hash list.  Returns hash.
+    my %config = $h->add_config(name => $name, config_key => $config_value);
 
-=head2 config (name => $name)
+Requires app name.  Adds config variables passed in hash list.  Returns hash config.
+
+=head2 config
+
+    my %config = $h->config(name => $name);
 
 Requires app name.  Returns hash reference of config variables.
 
-=head2 add_key (key => $key)
+=head2 add_key
+
+    my $bool = $h->add_key(key => ...);
 
 Requires key.  Adds ssh public key.
 
 =head2 keys
 
-Returns list of keys.
+    my @keys = $h->keys;
 
-=head2 remove_key (key_name => $key_name)
+Returns list of keys
+
+=head2 remove_key
+
+    my $bool = $h->remove_key(key_name => $key_name);
 
 Requires name associated with key.  Removes key.
 
-=head2 ps (name => $name)
+=head2 ps
+
+    my @processes = $h->ps(name => $name);
 
 Requires app name.  Returns list of processes.
 
-=head2 run (name => $name, command => $command)
+=head2 run
 
-Requires app name and command.  Runs command once.
+    my $process = $h->run(name => $name, command => $command);
 
-=head2 restart (name => $name, <ps => $ps>, <type => $type>)
+Requires app name and command.  Runs command once.  Returns hash response.
+
+=head2 restart
+
+    my $bool = $h->restart(name => $name);
+    my $bool = $h->restart(name => $name, ps => $ps, type => $type);
 
 Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
 
-=head2 stop (name => $name, <ps => $ps>, <type => $type>)
+=head2 stop
+
+    my $bool = $h->stop(name => $name, ps => $ps, type => $type);
 
 Requires app name.  Stop app process.
 
-=head2 releases(name => $name, <release => $release>)
+=head2 releases
+
+    my @releases = $h->releases(name => $name);
+    my %release  = $h->releases(name => $name, release => $release);
 
 Requires app name.  Returns list of hashrefs.
 If release name specified, returns hash.
 
-=head2 rollback(name => $name, release => $release)
+=head2 rollback
+
+    my $bool = $h->rollback(name => $name, release => $release);
 
 Rolls back to a specified releases
 
 =head2 error
+
+    my $message = $h->error;
+    my %err     = $h->error;
 
 In scalar context, returns error message from last request
 
@@ -270,7 +305,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 AUTHOR
 

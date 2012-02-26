@@ -51,15 +51,19 @@ sub create {
 sub add_config {
   my ($self, %params) = (shift, @_);
 
-  return $self->ua->put('/apps/'
-      . delete($params{name})
-      . '/config_vars' => Mojo::JSON->new->encode(\%params))->res->json;
+  return %{
+    $self->ua->put(
+          '/apps/'
+        . delete($params{name})
+        . '/config_vars' => Mojo::JSON->new->encode(\%params)
+      )->res->json
+    };
 }
 
 sub config {
   my ($self, %params) = (shift, @_);
 
-  return $self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json;
+  return %{$self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json};
 }
 
 sub add_key {
@@ -92,8 +96,9 @@ sub ps {
 sub run {
   my ($self, %params) = (shift, @_);
 
-  return $self->ua->post_form('/apps/' . $params{name} . '/ps' => \%params)
-    ->res->json;
+  return
+    %{$self->ua->post_form('/apps/' . $params{name} . '/ps' => \%params)
+      ->res->json};
 }
 
 sub restart {
@@ -109,9 +114,32 @@ sub stop {
 
   return 1
     if $self->ua->post_form('/apps/' . $params{name} . '/ps/stop' => \%params)
-    ->res->code == 200;
+      ->res->code == 200;
 }
 
+sub releases {
+  my ($self, %params) = (shift, @_);
+
+  my $url =
+      '/apps/'
+    . $params{name}
+    . '/releases'
+    . ($params{release} ? '/' . $params{release} : '');
+
+  my $releases = $self->ua->get($url)->res->json;
+
+  return $params{release} ? %$releases : @$releases;
+}
+
+sub rollback {
+  my ($self, %params) = (shift, @_);
+
+  $params{rollback} = delete $params{release};
+
+  return $params{rollback}
+    if $self->ua->post_form(
+    '/apps/' . $params{name} . '/releases' => \%params)->res->code == 200;
+}
 
 1;
 
@@ -151,9 +179,9 @@ Requires app name.  Destroys app.  Returns true if successful.
 
 Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
 
-=head2 add_config (name => $name, %()) -> {}
+=head2 add_config (name => $name, %()) -> %()
 
-Requires app name.  Adds config variables passed in hash list.
+Requires app name.  Adds config variables passed in hash list.  Returns hash.
 
 =head2 config (name => $name)
 
@@ -186,6 +214,19 @@ Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
 =head2 stop (name => $name, <ps => $ps>, <type => $type)
 
 Requires app name.  Stop app process.
+
+=head2 releases(name => $name, <release => $release>)
+
+Requires app name.  Returns list of hashrefs.
+If release name specified, returns hash.
+
+=head2 rollback(name => $name, release => $release)
+
+Rolls back to a specified releases
+
+=head1 SEE ALSO
+
+L<Mojo::UserAgent>, L<https://api-docs.heroku.com/>
 
 =head1 VERSION
 

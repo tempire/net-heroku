@@ -207,11 +207,11 @@ Requires app name.  Returns list of processes.
 
 Requires app name and command.  Runs command once.
 
-=head2 restart (name => $name, <ps => $ps>, <type => $type)
+=head2 restart (name => $name, <ps => $ps>, <type => $type>)
 
 Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
 
-=head2 stop (name => $name, <ps => $ps>, <type => $type)
+=head2 stop (name => $name, <ps => $ps>, <type => $type>)
 
 Requires app name.  Stop app process.
 

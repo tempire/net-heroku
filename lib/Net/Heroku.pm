@@ -4,7 +4,7 @@ use Net::Heroku::UserAgent;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
@@ -59,7 +59,7 @@ sub create {
 
   my $res = $self->ua->post_form('/apps', {%params})->res;
 
-  return %{$res->json} if $res->code == 202;
+  return $res->json && $res->code == 202 ? %{$res->json} : ();
 }
 
 sub add_config {
@@ -213,7 +213,7 @@ Requires app name.  Destroys app.  Returns true if successful.
 
     my $app = $h->create;
 
-Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
+Creates a Heroku app.  Accepts optional hash list as values, returns hash list.  Returns empty list on failure.
 
 =head2 add_config
 
@@ -305,7 +305,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 AUTHOR
 

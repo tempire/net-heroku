@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Net::Heroku;
-#use Devel::Dwarn;
+use Devel::Dwarn;
 
 use constant TEST => $ENV{TEST_ONLINE};
 
@@ -17,6 +17,10 @@ subtest errors => sub {
   # No error
   ok my %res = $h->create;
   ok !$h->error;
+
+  # Error, empty list assignment
+  ok !(my %tmp = $h->create(name => $res{name}));
+  ok !keys %tmp;
 
   # Error from json
   ok !$h->create(name => $res{name});
@@ -37,6 +41,7 @@ subtest errors => sub {
     code => 404,
     message => 'App not found.'
   };
+
 };
 
 subtest apps => sub {

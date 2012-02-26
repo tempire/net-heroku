@@ -1,0 +1,7 @@
+This file documents the revision history for the Net::Heroku distribution.
+
+0.02    2012-02-26 00:00:00
+        - Better POD
+
+0.01    2012-02-25 00:00:00
+        - Initial release

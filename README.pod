@@ -53,7 +53,7 @@ Requires app name.  Destroys app.  Returns true if successful.
 
     my $app = $h->create;
 
-Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
+Creates a Heroku app.  Accepts optional hash list as values, returns hash list.  Returns empty list on failure.
 
 =head2 add_config
 
@@ -145,7 +145,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 AUTHOR
 

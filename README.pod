@@ -14,7 +14,17 @@ Heroku API
     $h->add_config(name => $res->{name}, BUILDPACK_URL => ...);
     $h->restart(name => $res->{name});
 
+    say $_{name} for $h->apps;
+
+
     $h->destroy(name => $res->{name});
+
+    warn $h->error if $h->destroy(name => $res->{name}); # App not found.
+
+    if ($h->destroy(name => $res->{name})) {
+      my %err = $h->error;
+      warn $err{code}, $err{message}; # 404, App not found.
+    }
 
 =head1 METHODS
 
@@ -34,9 +44,9 @@ Requires app name.  Destroys app.  Returns true if successful.
 
 Creates a Heroku app.  Accepts optional hash list as values, returns hash list.
 
-=head2 add_config (name => $name, %()) -> {}
+=head2 add_config (name => $name, %()) -> %()
 
-Requires app name.  Adds config variables passed in hash list.
+Requires app name.  Adds config variables passed in hash list.  Returns hash.
 
 =head2 config (name => $name)
 
@@ -62,13 +72,34 @@ Requires app name.  Returns list of processes.
 
 Requires app name and command.  Runs command once.
 
-=head2 restart (name => $name, <ps => $ps>, <type => $type)
+=head2 restart (name => $name, <ps => $ps>, <type => $type>)
 
 Requires app name.  Restarts app.  If ps is supplied, only process is restarted.
 
-=head2 stop (name => $name, <ps => $ps>, <type => $type)
+=head2 stop (name => $name, <ps => $ps>, <type => $type>)
 
 Requires app name.  Stop app process.
+
+=head2 releases(name => $name, <release => $release>)
+
+Requires app name.  Returns list of hashrefs.
+If release name specified, returns hash.
+
+=head2 rollback(name => $name, release => $release)
+
+Rolls back to a specified releases
+
+=head2 error
+
+In scalar context, returns error message from last request
+
+In list context, returns hash with keys: code, message.
+
+If the last request was successful, returns empty list.
+
+=head1 SEE ALSO
+
+L<Mojo::UserAgent>, L<https://api-docs.heroku.com/>, L<http://mojolicio.us/perldoc/Mojo/UserAgent#DEBUGGING|MOJO_USERAGENT_DEBUG>
 
 =head1 VERSION
 

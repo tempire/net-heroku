@@ -16,6 +16,18 @@ sub new {
   return $self;
 }
 
+sub error {
+  my $self = shift;
+  my $res = $self->ua->tx->res;
+
+  return if $res->code =~ /^2\d{2}$/;
+
+  return (
+    code    => $res->code,
+    message => ($res->json ? $res->json->{error} : $res->body)
+  );
+}
+
 sub apps {
   my ($self, $name) = @_;
 
@@ -45,7 +57,9 @@ sub create {
     @ar,
   );
 
-  return %{$self->ua->post_form('/apps', {%params})->res->json};
+  my $res = $self->ua->post_form('/apps', {%params})->res;
+
+  return %{$res->json} if $res->code == 202;
 }
 
 sub add_config {
@@ -63,7 +77,8 @@ sub add_config {
 sub config {
   my ($self, %params) = (shift, @_);
 
-  return %{$self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json};
+  return
+    %{$self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json};
 }
 
 sub add_key {
@@ -159,7 +174,17 @@ Heroku API
     $h->add_config(name => $res->{name}, BUILDPACK_URL => ...);
     $h->restart(name => $res->{name});
 
+    say $_{name} for $h->apps;
+
+
     $h->destroy(name => $res->{name});
+
+    warn $h->error if $h->destroy(name => $res->{name}); # App not found.
+
+    if ($h->destroy(name => $res->{name})) {
+      my %err = $h->error;
+      warn $err{code}, $err{message}; # 404, App not found.
+    }
 
 =head1 METHODS
 
@@ -224,9 +249,17 @@ If release name specified, returns hash.
 
 Rolls back to a specified releases
 
+=head2 error
+
+In scalar context, returns error message from last request
+
+In list context, returns hash with keys: code, message.
+
+If the last request was successful, returns empty list.
+
 =head1 SEE ALSO
 
-L<Mojo::UserAgent>, L<https://api-docs.heroku.com/>
+L<Mojo::UserAgent>, L<https://api-docs.heroku.com/>, L<http://mojolicio.us/perldoc/Mojo/UserAgent#DEBUGGING|MOJO_USERAGENT_DEBUG>
 
 =head1 VERSION
 

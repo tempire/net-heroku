@@ -1,5 +1,5 @@
 .prove
 cover_db
-Net-Heroku-*
+Net-Heroku-?.??
 .build
 .DS_Store

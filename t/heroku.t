@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Net::Heroku;
-use Devel::Dwarn;
+#use Devel::Dwarn;
 
 use constant TEST => $ENV{TEST_ONLINE};
 
@@ -11,7 +11,34 @@ my $api_key  = 'f3d3e05d403651c24d1dc36532fe6b3884baf76a';
 
 ok my $h = Net::Heroku->new(api_key => $api_key);
 
-#subtest errors => sub
+subtest errors => sub {
+  plan skip_all => 'because' unless TEST;
+
+  # No error
+  ok my %res = $h->create;
+  ok !$h->error;
+
+  # Error from json
+  ok !$h->create(name => $res{name});
+  is $h->error => 'Name is already taken';
+
+  is_deeply {$h->error} => {
+    code => 422,
+    message => 'Name is already taken'
+  };
+
+  ok $h->destroy(name => $res{name});
+
+  # Error from body
+  ok !$h->destroy(name => $res{name});
+  is $h->error => 'App not found.';
+
+  is_deeply {$h->error} => {
+    code => 404,
+    message => 'App not found.'
+  };
+};
+
 subtest apps => sub {
   plan skip_all => 'because' unless TEST;
 

@@ -1,0 +1,30 @@
+apps          return list
+
+app_created   1 if code
+
+destroy       1 if code
+
+create        hash
+
+add_config    hash
+
+config        hash
+
+add_key       1 if code
+
+remove_key    1 if code
+
+keys          list of hash refs
+
+ps            list of hash refs
+
+run           hash
+
+restart       1 if code
+
+stop          1 if code
+
+releases      list of hash refs
+releases      hash if release name specified
+
+rollback      return 1/name/true if code

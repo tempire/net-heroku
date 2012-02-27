@@ -70,4 +70,8 @@ Net::Heroku::UserAgent inherits all methods from Mojo::UserAgent and implements 
 
 Builds a transaction using a persistently stored host
 
+=head2 build_form_tx
+
+Builds a form transaction using a persistently stored host
+
 =cut

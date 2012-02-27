@@ -1,5 +1,7 @@
 This file documents the revision history for the Net::Heroku distribution.
 
+0.04    0000-00-00 00:00:00
+
 0.03    2012-02-26 00:00:00
         - create returns empty list on failure
 

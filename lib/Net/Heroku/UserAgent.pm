@@ -56,7 +56,7 @@ sub build_tx {
 
 =head1 NAME
 
-Net::Heroku::UserAgent;
+Net::Heroku::UserAgent
 
 =head1 DESCRIPTION
 

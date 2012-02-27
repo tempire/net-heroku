@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use Net::Heroku;
-use Devel::Dwarn;
 
 use constant TEST => $ENV{TEST_ONLINE};
 

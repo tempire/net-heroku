@@ -10,9 +10,9 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head1 USAGE
 
-    my $h = Net::Heroku->new('api_key');
+    my $h = Net::Heroku->new(api_key => api_key);
     - or -
-    my $h = Net::Heroku->new('email', 'password');
+    my $h = Net::Heroku->new(email => $email, password => $password);
 
     my %res = $h->create;
 
@@ -36,9 +36,9 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head2 new
 
-    my $h = Net::Heroku->new('api_key');
+    my $h = Net::Heroku->new(api_key => $api_key);
     - or -
-    my $h = Net::Heroku->new('email', 'password');
+    my $h = Net::Heroku->new(email => $email, password => $password);
 
 Requires api key or user/pass. Returns Net::Heroku object.
 

@@ -15,7 +15,9 @@ subtest auth => sub {
   plan skip_all => 'because' unless TEST;
 
   is +Net::Heroku->new->_retrieve_api_key($username, $password) => $api_key;
-  is +Net::Heroku->new($username, $password)->ua->api_key => $api_key;
+  is +Net::Heroku->new(email => $username, password => $password)->ua->api_key => $api_key;
+
+  is +Net::Heroku->new(api_key => $api_key)->ua->api_key => $api_key;
 };
 
 subtest errors => sub {

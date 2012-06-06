@@ -10,17 +10,14 @@ has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
 
 sub new {
-  my $self = shift->SUPER::new(@_);
-
-  # Assume api key (api_key => $api_key is legacy syntax from pre-0.04)
-  if (@_ == 1 || "@_" eq 'api_key') {
-    $self->ua->api_key($_[0]);
-  }
+  my $self   = shift->SUPER::new(@_);
+  my %params = @_;
 
   # Assume email & pass
-  elsif (@_ == 2) {
-    $self->ua->api_key($self->_retrieve_api_key(@_));
-  }
+  $self->ua->api_key(
+    defined $params{email}
+    ? $self->_retrieve_api_key(@params{qw/ email password /})
+    : $params{api_key});
 
   return $self;
 }
@@ -192,9 +189,9 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head1 USAGE
 
-    my $h = Net::Heroku->new('api_key');
+    my $h = Net::Heroku->new(api_key => api_key);
     - or -
-    my $h = Net::Heroku->new('email', 'password');
+    my $h = Net::Heroku->new(email => $email, password => $password);
 
     my %res = $h->create;
 
@@ -218,9 +215,9 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head2 new
 
-    my $h = Net::Heroku->new('api_key');
+    my $h = Net::Heroku->new(api_key => $api_key);
     - or -
-    my $h = Net::Heroku->new('email', 'password');
+    my $h = Net::Heroku->new(email => $email, password => $password);
 
 Requires api key or user/pass. Returns Net::Heroku object.
 

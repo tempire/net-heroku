@@ -1,5 +1,10 @@
 This file documents the revision history for the Net::Heroku distribution.
 
+0.05    2012-06-05 00:00:00
+        - Changed expected text for BUILDPACK_URL config test
+        - Accepts user/pass in addition to API key
+        - ->new(api_key => $api_key) deprecated in favor of ->new($api_key)
+
 0.04    2012-02-27 00:00:00
         - Removed Devel::Dwarn dep
 

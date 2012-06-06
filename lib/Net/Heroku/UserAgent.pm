@@ -11,7 +11,7 @@ sub format_host {
 
   return
       'https://:'
-    . $self->api_key . '@'
+    . ($self->api_key||'') . '@'
     . $self->host
     . (substr($path, 0, 1) eq '/' ? '' : '/')    # optional slash
     . $path;

@@ -6,9 +6,17 @@ use Net::Heroku;
 use constant TEST => $ENV{TEST_ONLINE};
 
 my $username = 'cpantests@empireenterprises.com';
-my $api_key  = 'f3d3e05d403651c24d1dc36532fe6b3884baf76a';
+my $password = 'third13_wave';
+my $api_key  = 'd46d2e0a23e9dd1746d24f88ba6c52206246fb1f';
 
 ok my $h = Net::Heroku->new(api_key => $api_key);
+
+subtest auth => sub {
+  plan skip_all => 'because' unless TEST;
+
+  is +Net::Heroku->new->_retrieve_api_key($username, $password) => $api_key;
+  is +Net::Heroku->new($username, $password)->ua->api_key => $api_key;
+};
 
 subtest errors => sub {
   plan skip_all => 'because' unless TEST;
@@ -40,7 +48,6 @@ subtest errors => sub {
     code => 404,
     message => 'App not found.'
   };
-
 };
 
 subtest apps => sub {
@@ -53,6 +60,11 @@ subtest apps => sub {
 
   ok $h->destroy(name => $res{name});
   ok !grep $_->{name} eq $res{name} => $h->apps;
+
+  # Do not fail with empty names
+  #ok %res = $h->create(name => '');
+  #ok $res{name};
+  #ok $h->destroy(name => $res{name});
 };
 
 subtest config => sub {
@@ -123,7 +135,7 @@ subtest releases => sub {
 
   # List of releases
   my @releases = $h->releases(name => $res{name});
-  ok grep $_->{descr} eq 'Config add BUILDPACK_URL' => @releases;
+  ok grep $_->{descr} eq 'Add BUILDPACK_URL config' => @releases;
 
   # One release by name
   my %release =

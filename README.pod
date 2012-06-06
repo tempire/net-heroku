@@ -10,7 +10,10 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head1 USAGE
 
-    my $h = Net::Heroku->new(api_key => ...);
+    my $h = Net::Heroku->new('api_key');
+    - or -
+    my $h = Net::Heroku->new('email', 'password');
+
     my %res = $h->create;
 
     $h->add_config(name => $res{name}, BUILDPACK_URL => ...);
@@ -33,9 +36,11 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head2 new
 
-    my $h = Net::Heroku->new(api_key => $api_key);
+    my $h = Net::Heroku->new('api_key');
+    - or -
+    my $h = Net::Heroku->new('email', 'password');
 
-Requires api key. Returns Net::Heroku object.
+Requires api key or user/pass. Returns Net::Heroku object.
 
 =head2 apps
 
@@ -145,7 +150,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 AUTHOR
 

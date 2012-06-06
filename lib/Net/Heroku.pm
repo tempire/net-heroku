@@ -4,15 +4,24 @@ use Net::Heroku::UserAgent;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
-has 'api_key';
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->ua->api_key($self->api_key);
+
+  # Assume api key (api_key => $api_key is legacy syntax from pre-0.04)
+  if (@_ == 1 || "@_" eq 'api_key') {
+    $self->ua->api_key($_[0]);
+  }
+
+  # Assume email & pass
+  elsif (@_ == 2) {
+    $self->ua->api_key($self->_retrieve_api_key(@_));
+  }
+
   return $self;
 }
 
@@ -28,10 +37,18 @@ sub error {
   );
 }
 
+sub _retrieve_api_key {
+  my ($self, $email, $password) = @_;
+
+  return $self->ua->post_form(
+    '/login' => {email => $email, password => $password})
+    ->res->json('/api_key');
+}
+
 sub apps {
   my ($self, $name) = @_;
 
-  return @{$self->ua->get('/apps')->res->json};
+  return @{$self->ua->get('/apps')->res->json||[]};
 }
 
 sub app_created {
@@ -50,6 +67,9 @@ sub destroy {
 
 sub create {
   my ($self, %params) = (shift, @_);
+
+  # Empty space names no longer allowed
+  #delete $params{name} if !$params{name};
 
   my @ar = map +("app[$_]" => $params{$_}) => keys %params;
   %params = (
@@ -71,6 +91,7 @@ sub add_config {
         . delete($params{name})
         . '/config_vars' => Mojo::JSON->new->encode(\%params)
       )->res->json
+      || []
     };
 }
 
@@ -78,7 +99,8 @@ sub config {
   my ($self, %params) = (shift, @_);
 
   return
-    %{$self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json};
+    %{$self->ua->get('/apps/' . $params{name} . '/config_vars')->res->json
+      || []};
 }
 
 sub add_key {
@@ -91,7 +113,7 @@ sub add_key {
 sub keys {
   my ($self, %params) = (shift, @_);
 
-  return @{$self->ua->get('/user/keys')->res->json};
+  return @{$self->ua->get('/user/keys')->res->json || []};
 }
 
 sub remove_key {
@@ -105,7 +127,7 @@ sub remove_key {
 sub ps {
   my ($self, %params) = (shift, @_);
 
-  return @{$self->ua->get('/apps/' . $params{name} . '/ps')->res->json};
+  return @{$self->ua->get('/apps/' . $params{name} . '/ps')->res->json||[]};
 }
 
 sub run {
@@ -113,7 +135,7 @@ sub run {
 
   return
     %{$self->ua->post_form('/apps/' . $params{name} . '/ps' => \%params)
-      ->res->json};
+      ->res->json || {}};
 }
 
 sub restart {
@@ -141,7 +163,7 @@ sub releases {
     . '/releases'
     . ($params{release} ? '/' . $params{release} : '');
 
-  my $releases = $self->ua->get($url)->res->json;
+  my $releases = $self->ua->get($url)->res->json||[];
 
   return $params{release} ? %$releases : @$releases;
 }
@@ -170,7 +192,10 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head1 USAGE
 
-    my $h = Net::Heroku->new(api_key => ...);
+    my $h = Net::Heroku->new('api_key');
+    - or -
+    my $h = Net::Heroku->new('email', 'password');
+
     my %res = $h->create;
 
     $h->add_config(name => $res{name}, BUILDPACK_URL => ...);
@@ -193,9 +218,11 @@ Requires Heroku account - free @ L<http://heroku.com>
 
 =head2 new
 
-    my $h = Net::Heroku->new(api_key => $api_key);
+    my $h = Net::Heroku->new('api_key');
+    - or -
+    my $h = Net::Heroku->new('email', 'password');
 
-Requires api key. Returns Net::Heroku object.
+Requires api key or user/pass. Returns Net::Heroku object.
 
 =head2 apps
 
@@ -305,7 +332,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 AUTHOR
 

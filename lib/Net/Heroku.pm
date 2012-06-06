@@ -4,7 +4,7 @@ use Net::Heroku::UserAgent;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
@@ -329,7 +329,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.05
+0.06
 
 =head1 AUTHOR
 

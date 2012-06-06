@@ -1,5 +1,10 @@
 This file documents the revision history for the Net::Heroku distribution.
 
+0.06    2012-06-06 00:00:00
+        - IO::Socket::SSL dependency
+
+        - Changed expected text for BUILDPACK_URL config test
+        - Accepts email/pass in addition to API key
 0.05    2012-06-05 00:00:00
         - Changed expected text for BUILDPACK_URL config test
         - Accepts email/pass in addition to API key

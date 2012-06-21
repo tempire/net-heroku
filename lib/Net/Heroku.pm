@@ -4,7 +4,7 @@ use Net::Heroku::UserAgent;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
@@ -175,6 +175,33 @@ sub rollback {
     '/apps/' . $params{name} . '/releases' => \%params)->res->code == 200;
 }
 
+sub add_domain {
+  my ($self, %params) = (shift, @_);
+
+  my $url = '/apps/' . $params{name} . '/domains';
+
+  return 1
+    if $self->ua->post_form(
+        $url => {'domain_name[domain]' => $params{domain}})->res->code == 200;
+}
+
+sub domains {
+  my ($self, %params) = (shift, @_);
+
+  my $url = '/apps/' . $params{name} . '/domains';
+
+  return @{$self->ua->get($url)->res->json||[]};
+}
+
+sub remove_domain {
+  my ($self, %params) = (shift, @_);
+
+  return 1
+    if $self->ua->delete(
+        '/apps/' . $params{name} . '/domains/' . url_escape($params{domain})
+    )->res->code == 200;
+}
+
 1;
 
 =head1 NAME
@@ -302,6 +329,24 @@ Requires app name.  Stop app process.
 Requires app name.  Returns list of hashrefs.
 If release name specified, returns hash.
 
+=head2 add_domain
+
+    my $bool = $h->add_domain(name => $name, domain => $domain);
+
+Requires app name.  Adds domain.
+
+=head2 domains
+
+    my @domains = $h->domains(name => $name);
+
+Requires app name.  Returns list of hashrefs describing assigned domains.
+
+=head2 remove_domain
+
+    my $bool = $h->remove_domain(name => $name, domain => $domain);
+
+Requires app name associated with domain.  Removes domain.
+
 =head2 rollback
 
     my $bool = $h->rollback(name => $name, release => $release);
@@ -329,7 +374,7 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.07
+0.08
 
 =head1 AUTHOR
 

@@ -15,7 +15,8 @@ subtest auth => sub {
   plan skip_all => 'because' unless TEST;
 
   is +Net::Heroku->new->_retrieve_api_key($username, $password) => $api_key;
-  is +Net::Heroku->new(email => $username, password => $password)->ua->api_key => $api_key;
+  is +Net::Heroku->new(email => $username, password => $password)
+    ->ua->api_key => $api_key;
 
   is +Net::Heroku->new(api_key => $api_key)->ua->api_key => $api_key;
 };
@@ -35,8 +36,8 @@ subtest errors => sub {
   ok !$h->create(name => $res{name});
   is $h->error => 'Name is already taken';
 
-  is_deeply {$h->error} => {
-    code => 422,
+  is_deeply { $h->error } => {
+    code    => 422,
     message => 'Name is already taken'
   };
 
@@ -46,10 +47,29 @@ subtest errors => sub {
   ok !$h->destroy(name => $res{name});
   is $h->error => 'App not found.';
 
-  is_deeply {$h->error} => {
-    code => 404,
+  is_deeply { $h->error } => {
+    code    => 404,
     message => 'App not found.'
   };
+};
+
+subtest domains => sub {
+  plan skip_all => 'because' unless TEST;
+
+  ok my %res = $h->create;
+  ok !$h->domains(name => $res{name});
+
+  ok !$h->add_domain(name => $res{name}, domain => 'mojocasts.com');
+  is $h->error => 'Domain has already been taken';
+
+  my $domain = 'domain-name-for-' . $res{name} . '.com';
+  ok !$h->add_domain(name => $res{name}, domain => $domain);
+  is [$h->domains(name => $res{name})]->[0]->{base_domain} => $domain;
+
+  ok $h->remove_domain(name => $res{name}, domain => $domain);
+  ok !$h->domains(name => $res{name});
+
+  ok $h->destroy(name => $res{name});
 };
 
 subtest apps => sub {
@@ -77,7 +97,7 @@ subtest config => sub {
   is { $h->add_config(name => $res{name}, TEST_CONFIG => 'Net-Heroku') }
   ->{TEST_CONFIG} => 'Net-Heroku';
 
-  is {$h->config(name => $res{name})}->{TEST_CONFIG} => 'Net-Heroku';
+  is { $h->config(name => $res{name}) }->{TEST_CONFIG} => 'Net-Heroku';
 
   ok $h->destroy(name => $res{name});
 };
@@ -104,7 +124,7 @@ subtest processes => sub {
   ok grep defined $_->{pretty_state} => $h->ps(name => $res{name});
 
   # Run process
-  is { $h->run(name => $res{name}, command => 'ls') }->{action} => 'complete';
+  is { $h->run(name => $res{name}, command => 'ls') }->{state} => 'starting';
 
   # Restart app
   ok $h->restart(name => $res{name}), 'restart app';

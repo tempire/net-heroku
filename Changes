@@ -1,5 +1,8 @@
 This file documents the revision history for the Net::Heroku distribution.
 
+0.09    2012-06-30 00:00:00
+        - Requires IO::Socket::SSL > 1.75 for Mojolicious >= 3.0
+
 0.08    2012-06-21 00:00:00
         - Fixed run process test
         - Added add_domain, domains, remove_domain

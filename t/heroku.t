@@ -12,7 +12,7 @@ my $api_key  = 'd46d2e0a23e9dd1746d24f88ba6c52206246fb1f';
 ok my $h = Net::Heroku->new(api_key => $api_key);
 
 subtest auth => sub {
-  plan skip_all => 'because' unless TEST;
+  #plan skip_all => 'because' unless TEST;
 
   is +Net::Heroku->new->_retrieve_api_key($username, $password) => $api_key;
   is +Net::Heroku->new(email => $username, password => $password)

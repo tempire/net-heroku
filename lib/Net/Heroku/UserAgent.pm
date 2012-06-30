@@ -23,7 +23,7 @@ sub build_form_tx {
   my @params = @_;
 
   # Pre-assigned host
-  $params[0] = $self->format_host($params[0]) if @params;
+  #$params[0] = $self->format_host($params[0]) if @params;
 
   # Headers
   push @params => {Accept => 'application/json'};
@@ -40,7 +40,7 @@ sub build_tx {
   # $params[0] is http method)
 
   # Host
-  $params[1] = $self->format_host($params[1]);
+  #$params[1] = $self->format_host($params[1]);
 
   # Insert headers before form
   push @params => {Accept => 'application/json'} if @_ == 2;

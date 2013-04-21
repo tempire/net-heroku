@@ -57,17 +57,19 @@ subtest domains => sub {
   plan skip_all => 'because' unless TEST;
 
   ok my %res = $h->create;
-  ok !$h->domains(name => $res{name});
+
+  ok my $default_domain = [$h->domains(name => $res{name})]->[0];
+  is $default_domain->{domain} => $res{domain_name}->{domain};
 
   ok !$h->add_domain(name => $res{name}, domain => 'mojocasts.com');
-  is $h->error => 'Domain has already been taken';
+  is $h->error => 'mojocasts.com is currently in use by another app.';
 
   my $domain = 'domain-name-for-' . $res{name} . '.com';
   ok !$h->add_domain(name => $res{name}, domain => $domain);
-  is [$h->domains(name => $res{name})]->[0]->{base_domain} => $domain;
+  ok grep $_->{base_domain} eq $domain => $h->domains(name => $res{name});
 
   ok $h->remove_domain(name => $res{name}, domain => $domain);
-  ok !$h->domains(name => $res{name});
+  is_deeply $default_domain => [$h->domains(name => $res{name})]->[0];
 
   ok $h->destroy(name => $res{name});
 };
@@ -75,8 +77,8 @@ subtest domains => sub {
 subtest apps => sub {
   plan skip_all => 'because' unless TEST;
 
-  ok my %res = $h->create(stack => 'bamboo');
-  like $res{stack} => qr/^bamboo/;
+  ok my %res = $h->create(stack => 'cedar');
+  like $res{stack} => qr/^cedar/;
 
   ok grep $_->{name} eq $res{name} => $h->apps;
 
@@ -121,7 +123,8 @@ subtest processes => sub {
   ok my %res = $h->create;
 
   # List of processes
-  ok grep defined $_->{pretty_state} => $h->ps(name => $res{name});
+  #ok grep defined $_->{pretty_state} => $h->ps(name => $res{name});
+  ok !$h->ps(name => $res{name});
 
   # Run process
   is { $h->run(name => $res{name}, command => 'ls') }->{state} => 'starting';

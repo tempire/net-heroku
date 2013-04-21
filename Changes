@@ -1,5 +1,10 @@
 This file documents the revision history for the Net::Heroku distribution.
 
+0.10    2013-04-21 00:00:00
+        - Using form generator instead of post_form for Mojolicious >= 3.85
+        - Updated for API changes in ps and domain requests
+        - Fixed add_config 'Not a HASH reference' error when nothing returned
+
 0.09    2012-06-30 00:00:00
         - Requires IO::Socket::SSL > 1.75 for Mojolicious >= 3.0
 

@@ -5,49 +5,26 @@ has 'host';
 has 'tx';
 has 'api_key';
 
-sub format_host {
-  my $self = shift;
-  my $path = pop;
-
-  return
-      'https://:'
-    . ($self->api_key||'') . '@'
-    . $self->host
-    . (substr($path, 0, 1) eq '/' ? '' : '/')    # optional slash
-    . $path;
-}
-
-
-sub build_form_tx {
-  my $self   = shift;
-  my @params = @_;
-
-  # Pre-assigned host
-  $params[0] = $self->format_host($params[0]) if @params;
-
-  # Headers
-  push @params => {Accept => 'application/json'};
-
-  $self->tx($self->SUPER::build_form_tx(@params));
-
-  return $self->tx;
-}
-
 sub build_tx {
   my $self   = shift;
   my @params = @_;
 
-  # $params[0] is http method
-
-  # Host
-  $params[1] = $self->format_host($params[1]);
-
-  # Insert headers before form
-  push @params => {Accept => 'application/json'} if @_ == 2;
-  splice @params, -2, -1, $params[-2], {Accept => 'application/json'}
-    if @_ > 2;
-
   $self->tx($self->SUPER::build_tx(@params));
+
+  # URL
+  my $path = $self->tx->req->url->path;
+  $self->tx->req->url(
+    Mojo::URL->new(
+          'https://:'
+        . ($self->api_key || '') . '@'
+        . $self->host
+        . (substr($path, 0, 1) eq '/' ? '' : '/')    # optional slash
+        . $path
+    )
+  );
+
+  # Headers
+  $self->tx->req->headers->header(Accept => 'application/json');
 
   return $self->tx;
 }
@@ -69,9 +46,5 @@ Net::Heroku::UserAgent inherits all methods from Mojo::UserAgent and implements 
 =head2 build_tx
 
 Builds a transaction using a persistently stored host
-
-=head2 build_form_tx
-
-Builds a form transaction using a persistently stored host
-
-=cut
+46:	hit eof while in pod documentation (no =cut seen)
+	this can cause trouble with some pod utilities

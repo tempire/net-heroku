@@ -168,8 +168,9 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.09
+0.10
 
 =head1 AUTHOR
 
 Glen Hinkle C<tempire@cpan.org>
+

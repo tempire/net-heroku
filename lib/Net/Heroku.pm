@@ -4,10 +4,11 @@ use Net::Heroku::UserAgent;
 use Mojo::JSON;
 use Mojo::Util 'url_escape';
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 has host => 'api.heroku.com';
 has ua => sub { Net::Heroku::UserAgent->new(host => shift->host) };
+has 'api_key';
 
 sub new {
   my $self   = shift->SUPER::new(@_);
@@ -17,14 +18,16 @@ sub new {
   $self->ua->api_key(
     defined $params{email}
     ? $self->_retrieve_api_key(@params{qw/ email password /})
-    : $params{api_key});
+    : $params{api_key} ? $params{api_key}
+    :                    ''
+  );
 
   return $self;
 }
 
 sub error {
   my $self = shift;
-  my $res = $self->ua->tx->res;
+  my $res  = $self->ua->tx->res;
 
   return if $res->code =~ /^2\d{2}$/;
 
@@ -37,15 +40,15 @@ sub error {
 sub _retrieve_api_key {
   my ($self, $email, $password) = @_;
 
-  return $self->ua->post_form(
-    '/login' => {email => $email, password => $password})
+  return $self->ua->post(
+    '/login' => form => {email => $email, password => $password})
     ->res->json('/api_key');
 }
 
 sub apps {
   my ($self, $name) = @_;
 
-  return @{$self->ua->get('/apps')->res->json||[]};
+  return @{$self->ua->get('/apps')->res->json || []};
 }
 
 sub app_created {
@@ -74,7 +77,7 @@ sub create {
     @ar,
   );
 
-  my $res = $self->ua->post_form('/apps', {%params})->res;
+  my $res = $self->ua->post('/apps' => form => \%params)->res;
 
   return $res->json && $res->code == 202 ? %{$res->json} : ();
 }
@@ -82,14 +85,13 @@ sub create {
 sub add_config {
   my ($self, %params) = (shift, @_);
 
-  return %{
-    $self->ua->put(
+  return %{$self->ua->put(
           '/apps/'
-        . delete($params{name})
+        . (defined $params{name} and delete($params{name}))
         . '/config_vars' => Mojo::JSON->new->encode(\%params)
       )->res->json
-      || []
-    };
+      || {}
+  };
 }
 
 sub config {
@@ -124,14 +126,14 @@ sub remove_key {
 sub ps {
   my ($self, %params) = (shift, @_);
 
-  return @{$self->ua->get('/apps/' . $params{name} . '/ps')->res->json||[]};
+  return @{$self->ua->get('/apps/' . $params{name} . '/ps')->res->json || []};
 }
 
 sub run {
   my ($self, %params) = (shift, @_);
 
   return
-    %{$self->ua->post_form('/apps/' . $params{name} . '/ps' => \%params)
+    %{$self->ua->post('/apps/' . $params{name} . '/ps' => form => \%params)
       ->res->json || {}};
 }
 
@@ -139,16 +141,18 @@ sub restart {
   my ($self, %params) = (shift, @_);
 
   return 1
-    if $self->ua->post_form(
-    '/apps/' . $params{name} . '/ps/restart' => \%params)->res->code == 200;
+    if $self->ua->post(
+    '/apps/' . $params{name} . '/ps/restart' => form => \%params)->res->code
+    == 200;
 }
 
 sub stop {
   my ($self, %params) = (shift, @_);
 
   return 1
-    if $self->ua->post_form('/apps/' . $params{name} . '/ps/stop' => \%params)
-      ->res->code == 200;
+    if $self->ua->post(
+    '/apps/' . $params{name} . '/ps/stop' => form => \%params)->res->code
+    == 200;
 }
 
 sub releases {
@@ -160,7 +164,7 @@ sub releases {
     . '/releases'
     . ($params{release} ? '/' . $params{release} : '');
 
-  my $releases = $self->ua->get($url)->res->json||[];
+  my $releases = $self->ua->get($url)->res->json || [];
 
   return $params{release} ? %$releases : @$releases;
 }
@@ -171,8 +175,9 @@ sub rollback {
   $params{rollback} = delete $params{release};
 
   return $params{rollback}
-    if $self->ua->post_form(
-    '/apps/' . $params{name} . '/releases' => \%params)->res->code == 200;
+    if $self->ua->post(
+    '/apps/' . $params{name} . '/releases' => form => \%params)->res->code
+    == 200;
 }
 
 sub add_domain {
@@ -181,8 +186,9 @@ sub add_domain {
   my $url = '/apps/' . $params{name} . '/domains';
 
   return 1
-    if $self->ua->post_form(
-        $url => {'domain_name[domain]' => $params{domain}})->res->code == 200;
+    if $self->ua->post(
+    $url => form => {'domain_name[domain]' => $params{domain}})->res->code
+    == 200;
 }
 
 sub domains {
@@ -190,7 +196,7 @@ sub domains {
 
   my $url = '/apps/' . $params{name} . '/domains';
 
-  return @{$self->ua->get($url)->res->json||[]};
+  return @{$self->ua->get($url)->res->json || []};
 }
 
 sub remove_domain {
@@ -198,8 +204,8 @@ sub remove_domain {
 
   return 1
     if $self->ua->delete(
-        '/apps/' . $params{name} . '/domains/' . url_escape($params{domain})
-    )->res->code == 200;
+    '/apps/' . $params{name} . '/domains/' . url_escape($params{domain}))
+    ->res->code == 200;
 }
 
 1;
@@ -374,8 +380,10 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.09
+0.10
 
 =head1 AUTHOR
 
 Glen Hinkle C<tempire@cpan.org>
+
+=cut

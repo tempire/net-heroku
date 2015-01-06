@@ -1,7 +1,7 @@
 package Net::Heroku;
 use Mojo::Base -base;
 use Net::Heroku::UserAgent;
-use Mojo::JSON;
+use Mojo::JSON qw(encode_json);
 use Mojo::Util 'url_escape';
 
 our $VERSION = 0.10;
@@ -88,7 +88,7 @@ sub add_config {
   return %{$self->ua->put(
           '/apps/'
         . (defined $params{name} and delete($params{name}))
-        . '/config_vars' => Mojo::JSON->new->encode(\%params)
+        . '/config_vars' => encode_json(\%params)
       )->res->json
       || {}
   };

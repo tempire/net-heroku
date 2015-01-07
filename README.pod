@@ -1,3 +1,5 @@
+=pod
+
 =head1 NAME
 
 Net::Heroku - Heroku API
@@ -168,9 +170,14 @@ L<http://github.com/tempire/net-heroku>
 
 =head1 VERSION
 
-0.10
+0.11
 
 =head1 AUTHOR
 
 Glen Hinkle C<tempire@cpan.org>
 
+=head1 CONTRIBUTORS
+
+Brian D. Foy
+
+=cut

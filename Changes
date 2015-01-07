@@ -1,5 +1,8 @@
 This file documents the revision history for the Net::Heroku distribution.
 
+0.11    2014-01-06 00:00:00
+        - Switched to Mojo::JSON functional interface (briandfoy)
+
 0.10    2013-04-21 00:00:00
         - Using form generator instead of post_form for Mojolicious >= 3.85
         - Updated for API changes in ps and domain requests

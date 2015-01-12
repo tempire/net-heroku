@@ -142,7 +142,7 @@ subtest processes => sub {
 };
 
 subtest releases => sub {
-  plan skip_all => 'because' unless TEST;
+  #plan skip_all => 'because' unless TEST;
 
   ok my %res = $h->create;
 
@@ -160,7 +160,7 @@ subtest releases => sub {
 
   # List of releases
   my @releases = $h->releases(name => $res{name});
-  ok grep $_->{descr} eq 'Add BUILDPACK_URL config' => @releases;
+  ok grep $_->{descr} eq 'Set BUILDPACK_URL config vars' => @releases;
 
   # One release by name
   my %release =
@@ -168,7 +168,7 @@ subtest releases => sub {
   is $release{name} => $releases[-1]{name};
 
   # Rollback to a previous release
-  my $previous_release = 'v' . int @releases;
+  my $previous_release = 'v' . (int @releases - 1);
   is $h->rollback(name => $res{name}, release => $previous_release) =>
     $previous_release;
   ok !$h->rollback(name => $res{name}, release => 'v0');

@@ -1,6 +1,7 @@
 This file documents the revision history for the Net::Heroku distribution.
 
-0.11    2014-01-06 00:00:00
+0.11    2014-01-12 00:00:00
+        - Fixed rollback test, Fixed testing string for setting config vars
         - Switched to Mojo::JSON functional interface (briandfoy)
 
 0.10    2013-04-21 00:00:00
